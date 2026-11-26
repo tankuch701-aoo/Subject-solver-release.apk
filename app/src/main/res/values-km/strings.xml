@@ -1,0 +1,5 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+    <string name="app_name">ដោះស្រាយមុខវិជ្ជា</string>
+    <string name="tagline_subtitle">ស្កេន OCR ពហុភាសា និងគ្រូជំនួយ AI</string>
+</resources>

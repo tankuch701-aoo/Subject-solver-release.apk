@@ -1,0 +1,6 @@
+{
+  "name": "Subject Solver",
+  "description": "AI-powered multi-language subject solver with photo upload, direct camera capture, and interactive chat for math, Khmer, English, and global subjects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

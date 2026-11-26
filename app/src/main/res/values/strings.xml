@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Subject Solver</string>
+    <string name="tagline_subtitle">Multi-language OCR &amp; AI Tutor</string>
+    <string name="cd_app_logo">Subject Solver logo</string>
+    <string name="cd_history">Solve history</string>
+    <string name="cd_new_solve">New solve session</string>
+    <string name="cd_plus_menu">Add photo or camera</string>
+    <string name="cd_send_message">Send message</string>
+    <string name="cd_remove_image">Remove attached image</string>
+    <string name="cd_attached_image">Attached problem image</string>
+    <string name="cd_copy_answer">Copy solution</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_delete_session">Delete session</string>
+    <string name="cd_hero_illustration">Illustration of Subject Solver scanning multilingual study problems</string>
+    <string name="menu_take_photo">Take Photo (Camera)</string>
+    <string name="menu_upload_photo">Upload Photo or Picture</string>
+    <string name="menu_new_solve">New Problem</string>
+    <string name="input_placeholder">Tell details or ask anything (e.g. Solve #2 in Khmer)…</string>
+    <string name="camera_permission_rationale">Camera permission is needed to take a photo of your math or subject problem.</string>
+    <string name="copied_to_clipboard">Solution copied to clipboard</string>
+    <string name="ocr_solving_status">Reading problem &amp; solving…</string>
+    <string name="retry">Retry</string>
+</resources>
