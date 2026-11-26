@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
-import android.os.Build
 import android.util.LruCache
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
@@ -83,18 +82,14 @@ class ImageStorageHelper(private val context: Context) {
             BitmapFactory.decodeStream(stream, null, decodeOptions)
         } ?: return null
 
-        val orientation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.contentResolver.openInputStream(uri)?.use { stream ->
-                runCatching {
-                    ExifInterface(stream).getAttributeInt(
-                        ExifInterface.TAG_ORIENTATION,
-                        ExifInterface.ORIENTATION_NORMAL
-                    )
-                }.getOrDefault(ExifInterface.ORIENTATION_NORMAL)
-            } ?: ExifInterface.ORIENTATION_NORMAL
-        } else {
-            ExifInterface.ORIENTATION_NORMAL
-        }
+        val orientation = context.contentResolver.openInputStream(uri)?.use { stream ->
+            runCatching {
+                ExifInterface(stream).getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL
+                )
+            }.getOrDefault(ExifInterface.ORIENTATION_NORMAL)
+        } ?: ExifInterface.ORIENTATION_NORMAL
 
         val rotated = rotateIfNeeded(rawBitmap, orientation)
         return scaleDownIfNeeded(rotated, maxDimension)

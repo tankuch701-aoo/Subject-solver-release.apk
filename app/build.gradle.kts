@@ -16,8 +16,8 @@ android {
     applicationId = "com.aistudio.subjectsolver.qvnxrt"
     minSdk = 24
     targetSdk = 36
-    versionCode = 3
-    versionName = "1.3"
+    versionCode = 35
+    versionName = "1.5"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -118,7 +118,7 @@ dependencies {
   // implementation(libs.androidx.credentials.play.services)
   // implementation(libs.googleid)
   implementation(libs.firebase.appcheck.recaptcha)
-  implementation(libs.firebase.appcheck.debug)
+  debugImplementation(libs.firebase.appcheck.debug)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   // implementation(libs.logging.interceptor)

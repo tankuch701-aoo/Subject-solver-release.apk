@@ -1,5 +1,23 @@
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation">
+<resources>
     <string name="app_name">ដោះស្រាយមុខវិជ្ជា</string>
     <string name="tagline_subtitle">ស្កេន OCR ពហុភាសា និងគ្រូជំនួយ AI</string>
+    <string name="cd_app_logo">ឡូហ្គោកម្មវិធី Subject Solver</string>
+    <string name="cd_history">ប្រវត្តិដោះស្រាយ</string>
+    <string name="cd_new_solve">លំហាត់ថ្មី</string>
+    <string name="cd_plus_menu">បន្ថែមរូបភាព ឬកាមេរ៉ា</string>
+    <string name="cd_send_message">ផ្ញើសារ</string>
+    <string name="cd_remove_image">លុបរូបភាពដែលភ្ជាប់</string>
+    <string name="cd_attached_image">រូបភាពលំហាត់ដែលបានភ្ជាប់</string>
+    <string name="cd_copy_answer">ចម្លងចម្លើយ</string>
+    <string name="cd_close">បិទ</string>
+    <string name="cd_delete_session">លុបប្រវត្តិ</string>
+    <string name="cd_hero_illustration">រូបភាពបង្ហាញ Subject Solver ស្កេនលំហាត់ពហុភាសា</string>
+    <string name="menu_take_photo">ថតរូបផ្ទាល់ (កាមេរ៉ា)</string>
+    <string name="menu_upload_photo">បញ្ចូលរូបភាព ឬរូបថត</string>
+    <string name="menu_new_solve">លំហាត់ថ្មី</string>
+    <string name="input_placeholder">ប្រាប់ព័ត៌មានលម្អិត ឬសួរសំណួរ (ឧ. ដោះស្រាយលេខ២)…</string>
+    <string name="camera_permission_rationale">កម្មវិធីត្រូវការសិទ្ធិប្រើកាមេរ៉ា ដើម្បីថតរូបលំហាត់របស់អ្នក។</string>
+    <string name="copied_to_clipboard">បានចម្លងចម្លើយទុក</string>
+    <string name="ocr_solving_status">កំពុងអានអក្សរ និងដោះស្រាយ…</string>
+    <string name="retry">សាកល្បងម្ដងទៀត</string>
 </resources>
