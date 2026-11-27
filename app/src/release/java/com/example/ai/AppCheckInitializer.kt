@@ -18,9 +18,18 @@ fun configureAppCheck(context: Context, @Suppress("UNUSED_PARAMETER") intent: In
 
         val siteKey = runCatching { context.getString(R.string.recaptcha_site_key) }.getOrNull().orEmpty()
         if (siteKey.isNotBlank()) {
-            FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
-                RecaptchaAppCheckProviderFactory.getInstance(siteKey)
+            val appCheck = FirebaseAppCheck.getInstance()
+            appCheck.installAppCheckProviderFactory(
+                RecaptchaAppCheckProviderFactory.getInstance(siteKey),
+                true
             )
+            appCheck.getAppCheckToken(false)
+                .addOnSuccessListener {
+                    Log.d(TAG, "App Check token pre-warmed successfully.")
+                }
+                .addOnFailureListener { err ->
+                    Log.e(TAG, "App Check token pre-warm failed: ${err.message}", err)
+                }
             Log.d(TAG, "RecaptchaAppCheckProviderFactory installed.")
         } else {
             Log.e(TAG, "recaptcha_site_key resource string is blank.")
