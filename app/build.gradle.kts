@@ -16,8 +16,8 @@ android {
     applicationId = "com.aistudio.subjectsolver.qvnxrt"
     minSdk = 24
     targetSdk = 36
-    versionCode = 35
-    versionName = "1.5"
+    versionCode = 36
+    versionName = "1.5.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

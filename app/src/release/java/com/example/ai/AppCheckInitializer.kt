@@ -10,19 +10,28 @@ import com.google.firebase.appcheck.recaptcha.RecaptchaAppCheckProviderFactory
 
 private const val TAG = "AppCheckInit"
 
+@Volatile
+private var isRecaptchaInstalled = false
+
 fun configureAppCheck(context: Context, @Suppress("UNUSED_PARAMETER") intent: Intent?) {
     try {
         if (FirebaseApp.getApps(context).isEmpty()) {
             FirebaseApp.initializeApp(context)
         }
 
-        val siteKey = runCatching { context.getString(R.string.recaptcha_site_key) }.getOrNull().orEmpty()
+        val siteKey = runCatching { context.getString(R.string.recaptcha_site_key) }
+            .getOrNull()
+            .orEmpty()
+            .trim()
         if (siteKey.isNotBlank()) {
             val appCheck = FirebaseAppCheck.getInstance()
-            appCheck.installAppCheckProviderFactory(
-                RecaptchaAppCheckProviderFactory.getInstance(siteKey),
-                true
-            )
+            if (!isRecaptchaInstalled) {
+                appCheck.installAppCheckProviderFactory(
+                    RecaptchaAppCheckProviderFactory.getInstance(siteKey),
+                    true
+                )
+                isRecaptchaInstalled = true
+            }
             appCheck.getAppCheckToken(false)
                 .addOnSuccessListener {
                     Log.d(TAG, "App Check token pre-warmed successfully.")

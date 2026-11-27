@@ -7,19 +7,26 @@ import com.example.model.ChatMessage
 import com.example.model.LanguageMode
 import com.example.model.MessageRole
 import com.example.model.SubjectCategory
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.Content
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
+import com.google.firebase.appcheck.AppCheckToken
+import com.google.firebase.appcheck.FirebaseAppCheck
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 private const val TAG = "SubjectSolverRepo"
 private const val AI_TIMEOUT_MS = 60_000L
+private const val DUMMY_ERROR_APP_CHECK_TOKEN = "eyJlcnJvciI6IlVOS05PV05fRVJST1IifQ=="
 
 class SubjectSolverRepository {
 
@@ -77,8 +84,6 @@ class SubjectSolverRepository {
                 }
             }
 
-        val chat = model.startChat(history = chatHistory)
-
         val contextualDirective = buildString {
             append("[Context: Subject=${subjectCategory.displayName}, AppLanguage=${appLanguage.englishName}, OCRLanguage=${languageMode.displayName}. ")
             append(languageMode.instructionHint)
@@ -103,11 +108,30 @@ class SubjectSolverRepository {
         try {
             val accumulated = StringBuilder()
             withTimeout(AI_TIMEOUT_MS) {
-                chat.sendMessageStream(messageContent).collect { chunk ->
-                    val piece = chunk.text.orEmpty()
-                    if (piece.isNotEmpty()) {
-                        accumulated.append(piece)
-                        emit(accumulated.toString())
+                ensureValidAppCheckToken(forceRefresh = false)
+
+                suspend fun streamAttempt() {
+                    val chat = model.startChat(history = chatHistory)
+                    chat.sendMessageStream(messageContent).collect { chunk ->
+                        val piece = chunk.text.orEmpty()
+                        if (piece.isNotEmpty()) {
+                            accumulated.append(piece)
+                            emit(accumulated.toString())
+                        }
+                    }
+                }
+
+                try {
+                    streamAttempt()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    if (accumulated.isEmpty() && isAppCheckError(e)) {
+                        Log.w(TAG, "App Check token rejected; force-refreshing token and retrying once.", e)
+                        ensureValidAppCheckToken(forceRefresh = true)
+                        streamAttempt()
+                    } else {
+                        throw e
                     }
                 }
             }
@@ -124,6 +148,65 @@ class SubjectSolverRepository {
         } catch (e: Exception) {
             Log.e(TAG, "Firebase AI solver failed", e)
             throw e
+        }
+    }
+
+    private suspend fun ensureValidAppCheckToken(forceRefresh: Boolean) {
+        val appCheck = FirebaseAppCheck.getInstance()
+        val token: AppCheckToken = try {
+            appCheck.getAppCheckToken(forceRefresh).awaitTask()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            if (!forceRefresh) {
+                Log.w(TAG, "Initial App Check token check failed; retrying with forceRefresh=true.", e)
+                try {
+                    appCheck.getAppCheckToken(true).awaitTask()
+                } catch (retryErr: CancellationException) {
+                    throw retryErr
+                } catch (retryErr: Exception) {
+                    val detail = retryErr.localizedMessage ?: retryErr.javaClass.simpleName
+                    throw IllegalStateException(
+                        "Firebase App Check verification failed: $detail. Please check your internet connection and Google Play services."
+                    )
+                }
+            } else {
+                val detail = e.localizedMessage ?: e.javaClass.simpleName
+                throw IllegalStateException(
+                    "Firebase App Check verification failed: $detail. Please check your internet connection and Google Play services."
+                )
+            }
+        }
+
+        val tokenValue = token.token
+        if (tokenValue.isBlank() || tokenValue == DUMMY_ERROR_APP_CHECK_TOKEN) {
+            if (!forceRefresh) {
+                ensureValidAppCheckToken(forceRefresh = true)
+                return
+            }
+            throw IllegalStateException(
+                "Firebase App Check returned an invalid attestation token. Please check your internet connection and Google Play services."
+            )
+        }
+    }
+
+    private fun isAppCheckError(error: Throwable): Boolean {
+        val msg = error.message.orEmpty()
+        return msg.contains("App Check", ignoreCase = true) ||
+            msg.contains("appcheck", ignoreCase = true) ||
+            msg.contains("403", ignoreCase = true) ||
+            msg.contains("UNAUTHENTICATED", ignoreCase = true)
+    }
+
+    private suspend fun <T> Task<T>.awaitTask(): T = suspendCancellableCoroutine { cont ->
+        addOnSuccessListener { result ->
+            if (cont.isActive) cont.resume(result)
+        }
+        addOnFailureListener { exc ->
+            if (cont.isActive) cont.resumeWithException(exc)
+        }
+        addOnCanceledListener {
+            cont.cancel()
         }
     }
 }
